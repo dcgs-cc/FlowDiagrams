@@ -1,0 +1,76 @@
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 6 : Symbol not previously defined (STATUS)
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 6 : Symbol not previously defined (RP1)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 6 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 7 : Symbol not previously defined (STATUS)
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 7 : Symbol not previously defined (RP0)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 7 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 8 : Symbol not previously defined (ADDRH)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 8 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 9 : Symbol not previously defined (EEADRH)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 9 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 10 : Symbol not previously defined (ADDRL)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 10 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 11 : Symbol not previously defined (EEADR)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 11 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 13 : Symbol not previously defined (DATAADDR)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 13 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 14 : Symbol not previously defined (FSR)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 14 : Executable code and data must be defined in an appropriate section
+Error[150]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 15 : Labels must be defined in a code or data section when making an object file
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 15 : Symbol not previously defined (INDF)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 15 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 16 : Symbol not previously defined (EEDATA)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 16 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 17 : Symbol not previously defined (FSR)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 17 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 18 : Symbol not previously defined (INDF)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 18 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 19 : Symbol not previously defined (EEDATH)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 19 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 20 : Symbol not previously defined (FSR)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 20 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 21 : Symbol not previously defined (STATUS)
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 21 : Symbol not previously defined (RP0)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 21 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 22 : Symbol not previously defined (EECON1)
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 22 : Symbol not previously defined (EEPGD)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 22 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 23 : Symbol not previously defined (EECON1)
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 23 : Symbol not previously defined (WREN)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 23 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 24 : Symbol not previously defined (INTCON)
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 24 : Symbol not previously defined (GIE)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 24 : Executable code and data must be defined in an appropriate section
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 25 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 26 : Symbol not previously defined (EECON2)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 26 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 27 : Symbol not previously defined (AAh)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 27 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 28 : Symbol not previously defined (EECON2)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 28 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 29 : Symbol not previously defined (EECON1)
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 29 : Symbol not previously defined (WR)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 29 : Executable code and data must be defined in an appropriate section
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 30 : Executable code and data must be defined in an appropriate section
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 32 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 34 : Symbol not previously defined (EECON1)
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 34 : Symbol not previously defined (WREN)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 34 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 35 : Symbol not previously defined (INTCON)
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 35 : Symbol not previously defined (GIE)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 35 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 36 : Symbol not previously defined (STATUS)
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 36 : Symbol not previously defined (RP0)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 36 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 37 : Symbol not previously defined (EEADR)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 37 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 38 : Symbol not previously defined (EEADR)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 38 : Executable code and data must be defined in an appropriate section
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 39 : Executable code and data must be defined in an appropriate section
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 40 : Executable code and data must be defined in an appropriate section
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 41 : Symbol not previously defined (STATUS)
+Error[113]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 41 : Symbol not previously defined (Z)
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 41 : Executable code and data must be defined in an appropriate section
+Error[151]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 42 : Operand contains unresolvable labels or is too complex
+Error[152]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 42 : Executable code and data must be defined in an appropriate section
+Error[129]   E:\PIC_STUFF\PROJECTS\SERIAL_EMULATOR\WRITE1876A.ASM 43 : Expected (END)
