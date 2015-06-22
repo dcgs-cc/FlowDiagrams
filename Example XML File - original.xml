@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<main start="1">
+	<box type="input" command="Input S0" id="1" nextBox="2" />
+	<box type="process" command="S0 = S0 AND 0x01" id="2" nextBox="3" />
+	<box type="decision" command="S0 = 0x00?" id="3" noBox="5" yesBox="4" />
+	<box type="subroutine" command="wait()" id="4" nextBox="1" />
+	<box type="process" command="S1 = 0x0E" id="5" nextBox="6" />
+	<box type="output" command="Output S1" id="6" nextBox="9" />
+	<box type="process" command="S1 = 0x00" id="7" nextBox="10" />
+	<box type="subroutine" command="wait()" id="8" nextBox="7" />
+	<box type="subroutine" command="wait()" id="9" nextBox="8" />
+	<box type="output" command="Output S1" id="10" nextBox="1" />
+	<sub start="2" name="wait">
+		<box type="process" command="Wait 0xFA" id="1" nextBox="3" />
+		<box type="process" command="Wait 0xFA" id="2" nextBox="1" />
+		<box type="process" command="Wait 0xFA" id="3" nextBox="4" />
+		<box type="process" command="Wait 0xFA" id="4" nextBox="5" />
+		<box type="return" id="5" />
+	</sub>
+</main>
+

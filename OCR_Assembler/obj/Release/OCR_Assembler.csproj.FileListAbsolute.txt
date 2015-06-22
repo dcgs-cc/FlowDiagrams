@@ -1,0 +1,5 @@
+C:\Users\cc\documents\visual studio 2010\Projects\FlowDiagrams\OCR_Assembler\bin\Release\OCR_Assembler.dll
+C:\Users\cc\documents\visual studio 2010\Projects\FlowDiagrams\OCR_Assembler\bin\Release\OCR_Assembler.pdb
+C:\Users\cc\documents\visual studio 2010\Projects\FlowDiagrams\OCR_Assembler\obj\Release\ResolveAssemblyReference.cache
+C:\Users\cc\documents\visual studio 2010\Projects\FlowDiagrams\OCR_Assembler\obj\Release\OCR_Assembler.dll
+C:\Users\cc\documents\visual studio 2010\Projects\FlowDiagrams\OCR_Assembler\obj\Release\OCR_Assembler.pdb

@@ -1,0 +1,9 @@
+C:\Users\cc\Documents\Visual Studio 2010\Backup_Projects\FlowDiagrams\SerialProgrammer\bin\Debug\SerialProgrammer.dll
+C:\Users\cc\Documents\Visual Studio 2010\Backup_Projects\FlowDiagrams\SerialProgrammer\bin\Debug\SerialProgrammer.pdb
+C:\Users\cc\Documents\Visual Studio 2010\Backup_Projects\FlowDiagrams\SerialProgrammer\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\cc\Documents\Visual Studio 2010\Backup_Projects\FlowDiagrams\SerialProgrammer\obj\Debug\SerialProgrammer.dll
+C:\Users\cc\Documents\Visual Studio 2010\Backup_Projects\FlowDiagrams\SerialProgrammer\obj\Debug\SerialProgrammer.pdb
+C:\Users\cc\Documents\Visual Studio 2010\Projects\FlowDiagrams\SerialProgrammer\bin\Debug\SerialProgrammer.dll
+C:\Users\cc\Documents\Visual Studio 2010\Projects\FlowDiagrams\SerialProgrammer\bin\Debug\SerialProgrammer.pdb
+C:\Users\cc\Documents\Visual Studio 2010\Projects\FlowDiagrams\SerialProgrammer\obj\Debug\SerialProgrammer.dll
+C:\Users\cc\Documents\Visual Studio 2010\Projects\FlowDiagrams\SerialProgrammer\obj\Debug\SerialProgrammer.pdb
