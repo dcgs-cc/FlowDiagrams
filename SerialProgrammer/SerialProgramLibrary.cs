@@ -24,6 +24,7 @@ namespace SerialProgrammer
         public int Code_break = 0x4f0;
         public System.IO.Ports.SerialPort serialPort1;
         public bool SimpleModel = false;// used to flag if we are using the simple 16F84A model....
+        public bool InLineAssembler = false;
         #endregion
 
         //delegate for call backs to forms...
@@ -166,11 +167,12 @@ namespace SerialProgrammer
         public bool WaitBreakMessage(ref OCRmodel o1)
         {
             if (serialPort1.BytesToRead < 10) return false;
-            string s= WaitMessage();
+            string s= WaitMessage(); //s has status reg
             if (s == "") return false;
-            o1.Z = "0";
+            o1.Z = "0"; o1.C = "0";
             int z1 = System.Convert.ToInt16(s.Substring(1,1),16);//bit 2 is Z flag
-            if ((z1 & 0x04) == 0x04) o1.Z = "1";
+            if ((z1 & 0x04) == 0x04) o1.Z = "1";  //bit 2 is Z flag
+            if ((z1 & 0x01) == 0x01) o1.C = "1";  //bit 0 is C flag
             o1.W = s.Substring(2, 2);
             for (int i = 0; i < 8; i++)
             {
@@ -323,7 +325,7 @@ namespace SerialProgrammer
             version_s = version_s.Substring(8);
             double version = System.Convert.ToDouble(version_s);
             //has already produced MC for version 1.nn or less....
-            string s1="";
+            string s1 = "";
             max_hexlines = 0;
             if (version >= 2) // has output as port B....
             {
@@ -340,28 +342,18 @@ namespace SerialProgrammer
                 }
             }
             for (int i = 0; i < max_hexlines; i++) s += hexcode[i];
-            if(!ProgramAny(update1, No_Words, Code_start, s)) return false;
+            if (!ProgramAny(update1, No_Words, Code_start, s)) return false;
             if (FindLabel_asm("TABLE", ref n1))
             {
                 //n1 has the word address..... 4* for chars...
-                if (s.Length <= n1 * 4) {update1(1, 0, "TABLE exists but no data in the TABLE"); return false; }
+                if (s.Length <= n1 * 4) { update1(1, 0, "TABLE exists but no data in the TABLE"); return false; }
                 s = s.Substring(n1 * 4);
-                if(s.Length>4*255){update1(1, 0, "TABLE too long"); return false; }
+                if (s.Length > 4 * 255) { update1(1, 0, "TABLE too long"); return false; }
                 if (!ProgramAny(update1, No_Words, Table_start, s)) return false;
             }
             return true;
-            //end new code....
-            /* old code...
-            ReadCode(update1);//get a copy of the current pic code....
-
-            string pic_type = SendMessage("@@@@X");
-
-            if (pic_type == "16F876") return Program876(update1);
-            if (pic_type == "16F876A") return Program876A(update1);
-            if (pic_type == "16F886") return Program886(update1);
-            update1(10, 0, "unknown PIC type :" + pic_type); return false;
-             */
         }
+
         #endregion
 
         #region Assembly Routines
@@ -428,6 +420,40 @@ namespace SerialProgrammer
             labels[maxlabels] = "WRITEEEPROM";//not used in simple code...
             labelvalues_code[maxlabels] = 0x308 - Code_start;
             maxlabels++;
+            //following used for Winstar WG12864A display (Tristam Newmann)
+            labels[maxlabels] = "TRIS_CLEAR";//not used in simple code...
+            labelvalues_code[maxlabels] = 0x309 - Code_start;
+            maxlabels++;
+            labels[maxlabels] = "TRIS_RESET";//not used in simple code...
+            labelvalues_code[maxlabels] = 0x30A - Code_start;
+            maxlabels++;
+            labels[maxlabels] = "TRIS_SETX";//not used in simple code...
+            labelvalues_code[maxlabels] = 0x30B - Code_start;
+            maxlabels++;
+            labels[maxlabels] = "TRIS_SETY";//not used in simple code...
+            labelvalues_code[maxlabels] = 0x30C - Code_start;
+            maxlabels++;
+            labels[maxlabels] = "TRIS_SETZ";//not used in simple code...
+            labelvalues_code[maxlabels] = 0x30D - Code_start;
+            maxlabels++;
+            labels[maxlabels] = "TRIS_CMD";//not used in simple code...
+            labelvalues_code[maxlabels] = 0x30E - Code_start;
+            maxlabels++;
+            labels[maxlabels] = "TRIS_WRDATA";//not used in simple code...
+            labelvalues_code[maxlabels] = 0x30F - Code_start;
+            maxlabels++;
+            labels[maxlabels] = "TRIS_RDDATA";//not used in simple code...
+            labelvalues_code[maxlabels] = 0x310 - Code_start;
+            maxlabels++;
+            labels[maxlabels] = "TRIS_SELCS1";//not used in simple code...
+            labelvalues_code[maxlabels] = 0x311 - Code_start;
+            maxlabels++;
+            labels[maxlabels] = "TRIS_SELCS2";//not used in simple code...
+            labelvalues_code[maxlabels] = 0x312 - Code_start;
+            maxlabels++;
+            labels[maxlabels] = "TRIS_SETPIXEL";//not used in simple code...
+            labelvalues_code[maxlabels] = 0x313 - Code_start;
+            maxlabels++;
 
 
             //first run through to get the labels...
@@ -486,10 +512,16 @@ namespace SerialProgrammer
         }
         protected bool ProcessLine_ToAssembler(string input, ref string line, ref string hexline, ref int no_lines, bool ResolveLabels,ref string ErrorString, bool out_Option)
         {
+
             //out_Option is true if the output is to port B
             string nl = Environment.NewLine;
+            string s1 = "";
+            if (ResolveLabels)
+            {
+                s1 = "k";
+            }
             char t1 = (char)0x09; string t = ""; t += t1;
-            line = line.ToUpper();
+            //line = line.ToUpper();
             string label = ""; int i = 0;
             int bit1 = 0; int bit2 = 0;
             string op = "";
@@ -505,378 +537,639 @@ namespace SerialProgrammer
             if (label == "TABLE"){ line += t + "ORG 0x400" + t + nl + label + nl + t; }
             else { line += label + (char)0x09; }
 
-            switch (op)
+            if (!InLineAssembler)
+            {   //else see below
+                switch (op)  //all OCR codes...
+                {
+                    case "}": line += "}" + nl; no_lines += 1; break;
+                    case "":
+                        line += "nop" + nl;
+                        hexline += "0000"; no_lines += 1;
+                        break;
+                    case "NOP":
+                        line += "nop" + nl;
+                        hexline += "0000"; no_lines += 1;
+                        break;
+                    case "MOVI":
+                        if (Rd < 10)
+                        {
+                            line += "movlw " + t + "0x" + data + nl;
+                            line += t + "movwf" + t + "R" + Rd.ToString() + nl;
+                            if (data.Length == 1) data = "0" + data;
+                            hexline += "30" + data;// movlw
+                            hexline += "00" + (Rd + 0xA0).ToString("X");//movwf  (S0 is stored at 0x020 in PIC memory
+                            no_lines += 2;
+                        }
+                        else
+                        {//need to use bank 3....  
+                            line += "movlw " + t + "0x" + data + nl;
+                            line += "bsf STATUS,5" + nl;
+                            line += "bsf STATUS,6" + nl;
+                            line += t + "movwf" + t + "R" + Rd.ToString() + nl;
+                            line += "bcf STATUS,5" + nl;
+                            line += "bcf STATUS,6" + nl;
+                            if (data.Length == 1) data = "0" + data;
+                            hexline += "30" + data;// movlw
+                            hexline += "1613"; hexline += "1603";
+                            hexline += "00" + (Rd + 0xA0).ToString("X");//movwf  (S0 is stored at 0x020 in PIC memory
+                            hexline += "1213"; hexline += "1303";
+                            no_lines += 6;
+                        }
+                        break;
+                    case "MOV":
+                        line += "movf" + t + "R" + Rs.ToString() + ",0 " + nl;//ie to W
+                        line += t + "movwf" + t + "R" + Rd.ToString() + nl;
+                        if (data.Length == 1) data = "0" + data;
+                        hexline += "08" + (Rs + 0x20).ToString("X");//movf to W
+                        hexline += "00" + (Rd + 0xA0).ToString("X");//movwf
+                        no_lines += 2;
+                        break;
+                    case "ADD":
+                        line += "movf" + t + "R" + Rs.ToString() + ",0 " + nl;
+                        line += t + "addwf" + t + "R" + Rd.ToString() + ",1 " + nl;
+                        hexline += "08" + (Rs + 0x20).ToString("X");//movf to W
+                        hexline += "07" + (Rd + 0xA0).ToString("X");//addwf
+                        no_lines += 2;
+                        break;
+                    case "SUB":
+                        line += "movf" + t + "R" + Rs.ToString() + ",0 " + nl;
+                        line += t + "subwf" + t + "R" + Rd.ToString() + ",1 " + nl;
+                        hexline += "08" + (Rs + 0x20).ToString("X");//movf to W
+                        hexline += "02" + (Rd + 0xA0).ToString("X");//subwf to F
+                        no_lines += 2;
+                        break;
+                    case "AND":
+                        line += "movf" + t + "R" + Rs.ToString() + ",0 " + nl;
+                        line += t + "andwf" + t + "R" + Rd.ToString() + ",1 " + nl;
+                        hexline += "08" + (Rs + 0x20).ToString("X");//movf to W
+                        hexline += "05" + (Rd + 0xA0).ToString("X");//andwf to F                   
+                        no_lines += 2;
+                        break;
+                    case "EOR":
+                        line += "movf" + t + "R" + Rs.ToString() + ",0 " + nl;
+                        line += t + "xorwf" + t + "R" + Rd.ToString() + ",1 " + nl;
+                        hexline += "08" + (Rs + 0x20).ToString("X");//movf to W
+                        hexline += "06" + (Rd + 0xA0).ToString("X");//xorwf to F
+                        no_lines += 2;
+                        break;
+                    case "INC":
+                        line += "incf" + t + "R" + Rd.ToString() + ",1 " + nl;
+                        hexline += "0A" + (Rd + 0xA0).ToString("X");//incf to F
+                        no_lines += 1;
+                        break;
+                    case "DEC":
+                        line += "decf" + t + "R" + Rd.ToString() + ",1 " + nl;
+                        hexline += "03" + (Rd + 0xA0).ToString("X");//decf to F
+                        no_lines += 1;
+                        break;
+
+                    case "IN":
+                        if (!out_Option)
+                        {
+                            //read from portB
+                            line += "movf" + t + "PORTB,0" + nl;
+                            line += t + "movwf" + t + "R" + Rd.ToString() + nl;
+                            hexline += "0806";//movf to W
+                            hexline += "00" + (Rd + 0xA0).ToString("X");//movwf
+                            no_lines += 2;
+                        }
+                        if (out_Option)
+                        {
+                            //read from PORT C
+
+                            //movf PORTC,W
+                            line += t + "movf" + t + "PORTC,0" + nl;
+                            hexline += "0807";//movf to W
+
+                            //andlw  0x3F
+                            line += t + "andlw" + t + " 0x3F" + nl;
+                            hexline += "393F";
+
+                            //movwf Rd
+                            line += t + "movwf" + t + "R" + Rd.ToString() + nl;
+                            hexline += "00" + (Rd + 0xA0).ToString("X");//movwf
+
+                            // btfsc   porta,4
+                            line += t + "btfsc PORTA,4" + nl;
+                            hexline += "1A05";
+
+                            // BSF  rd,6
+                            line += t + "bsf" + t + "R" + Rd.ToString() + ",6" + nl;
+                            hexline += "17" + (Rd + 0x20).ToString("X");
+
+                            // btfsc   porta,5
+                            line += t + "btfsc PORTA,5" + nl;
+                            hexline += "1A85";
+
+                            //BSF  RD,7
+                            line += t + "bsf" + t + "R" + Rd.ToString() + ",7" + nl;
+                            hexline += "17" + (Rd + 0xA0).ToString("X");
+
+                            no_lines += 7;
+
+                        }
+                        break;
+
+                    case "OUT":
+                        if (!out_Option)
+                        {
+                            //tricky here cos bits 0-5 can go to port C, but b6/7 to Port A bits 4/5
+                            //  movf    Rs,W
+                            line += "movf" + t + "R" + Rs.ToString() + ",0" + nl;
+                            hexline += "08" + (Rs + 0x20).ToString("X");//movf to W
+
+                            //  movwf   PORTC   dont think this messes up serial...
+                            line += t + "movwf" + t + "PORTC" + nl;
+                            hexline += "0087";
+
+                            //  movwf   temp1
+                            line += t + "movwf" + t + "temp1" + nl;
+                            hexline += "00AA";//temp1 is at 2A
+
+                            //  rrf     temp1,1
+                            line += t + "rrf" + t + "temp1" + nl;
+                            hexline += "0CAA";
+
+                            //  rrf     temp1,1    bit 7 - 5
+                            line += t + "rrf" + t + "temp1" + nl;
+                            hexline += "0CAA";
+
+                            //  movlw   0x30
+                            line += t + "movlw" + t + "0x30" + nl;
+                            hexline += "3030";
+
+                            //  andwf   temp1,0
+                            line += t + "andwf" + t + "temp1,0" + nl;
+                            hexline += "052A";
+
+                            //  movwf   PORTA
+                            line += t + "movwf" + t + "PORTA" + nl;
+                            hexline += "0085";
+                            no_lines += 8;
+                        }
+
+                        if (out_Option)
+                        {
+
+                            //re-program to move out to PORT B 
+                            //  movf    Rs,W
+                            line += t + "movf" + t + "R" + Rs.ToString() + ",0" + nl;
+                            hexline += "08" + (Rs + 0x20).ToString("X");//movf to W
+
+                            //  movwf   PORTB  
+                            line += t + "movwf" + t + "PORTB" + nl;
+                            hexline += "0086";
+                            no_lines += 2;
+                        }
+                        break;
+
+                    case "TRISQ":
+                        if (!out_Option)
+                        {
+                            //tricky here cos bits 0-5 can go to port C, but b6/7 to Port A bits 4/5
+
+                            line += "movf" + t + "R" + Rs.ToString() + ",0" + nl;
+                            hexline += "08" + (Rs + 0x20).ToString("X");//movf to W
+
+                            //  movwf   PORTC   dont think this messes up serial...
+                            line += t + "movwf" + t + "PORTC" + nl;
+                            hexline += "0087";
+
+                            //  movwf   temp1
+                            line += t + "movwf" + t + "temp1" + nl;
+                            hexline += "00AA";//temp1 is at 2A
+
+                            //  rrf     temp1,1
+                            line += t + "rrf" + t + "temp1" + nl;
+                            hexline += "0CAA";
+
+                            //  rrf     temp1,1    bit 7 - 5
+                            line += t + "rrf" + t + "temp1" + nl;
+                            hexline += "0CAA";
+
+                            //  movlw   0x30
+                            line += t + "movlw" + t + "0x30" + nl;
+                            hexline += "3030";
+
+                            //  andwf   temp1,0
+                            line += t + "andwf" + t + "temp1,0" + nl;
+                            hexline += "052A";
+
+                            //  movwf   PORTA
+                            line += t + "movwf" + t + "PORTA" + nl;
+                            hexline += "0085";
+                            no_lines += 8;
+                        }
+
+                        if (out_Option)
+                        {
+
+                            // output on PORT B so only need to TRIS B   S0 has mask
+                            //  movf    R0,W
+                            line += t + "movf" + t + "R0,0" + nl;
+                            hexline += "08" + (0x20).ToString("X");//movf to W
+                            //bsf STATUS,RP0
+                            line += t + "bsf" + t + "STATUS, RP0" + nl;//bank 1
+                            hexline += "1683";
+                            //movwf TRISB
+                            line += t + "movwf" + t + "TRISB" + nl;//
+                            hexline += "0086";
+                            //bcf STATUS,RP0
+                            line += t + "bcf" + t + "STATUS, RP0" + nl;//bank 1
+                            hexline += "1283";
+
+                            no_lines += 4;
+                        }
+                        break;
+
+                    case "JP":
+                        line += "goto" + t + data + nl;
+                        if (ResolveLabels)
+                        {
+                            if (FindLabel_asm(data, ref i)) i += Code_start + 0x800;
+                            else
+                            {
+                                ErrorString = "Label " + data + " not found "; return false;
+                            }
+                        }
+
+
+                        hexline += "2" + i.ToString("X");//goto... 
+                        no_lines += 1;
+                        break;
+                    case "JZ":
+                        line += "btfsc" + t + "STATUS,2" + nl;
+                        line += t + "goto" + t + data + nl;
+                        hexline += "1903";// status = 3
+                        if (ResolveLabels)
+                        {
+                            if (FindLabel_asm(data, ref i)) i += Code_start + 0x800;
+                            else { ErrorString = "Label " + data + " not found "; return false; }
+                        }
+                        hexline += "2" + i.ToString("X");//goto... 
+                        no_lines += 2;
+                        break;
+                    case "JNZ":
+                        line += "btfss" + t + "STATUS,2" + nl;
+                        line += t + "goto" + t + data + nl;
+                        hexline += "1D03";// status = 3
+                        if (ResolveLabels)
+                        {
+                            if (FindLabel_asm(data, ref i)) i += Code_start + 0x800;
+                            else { ErrorString = "Label " + data + " not found "; return false; }
+                        }
+                        hexline += "2" + i.ToString("X");//goto... 
+                        no_lines += 2;
+                        break;
+                    case "JGT": //not really in the OCR set but included for the problem of flow diagrams gt
+                        //after subwf Y,W   sub w from F
+                        //  if W>Y then C=0 and jump is jump if  W>Y
+                        //if w < Y: Status,Z = 0. Status,C = 1. wnew = Y-w. 
+                        //if w == Y: Status,Z = 1. Status,C = 1. wnew = 0. 
+                        //if Y < w: Status,Z = 0. Status,C = 0. wnew = Y-w + 0x100.
+
+                        line += "btfss" + t + "STATUS,0" + nl;//carry flag
+                        line += t + "goto" + t + data + nl;
+                        hexline += "1C03";// status = 3 and bit =0
+                        if (ResolveLabels)
+                        {
+                            if (FindLabel_asm(data, ref i)) i += Code_start + 0x800;
+                            else { ErrorString = "Label " + data + " not found "; return false; }
+                        }
+                        hexline += "2" + i.ToString("X");//goto... 
+                        no_lines += 2;
+                        break;
+
+
+                    case "RCALL":
+                        line += "call" + t + data + nl; i = 0;
+                        if (ResolveLabels)
+                        {
+                            if (FindLabel_asm(data, ref i)) i += Code_start;
+                            else { ErrorString = "Label " + data + " not found "; return false; }
+                        }
+                        s1 = i.ToString("X");
+                        while (s1.Length < 3) s1 = "0" + s1;
+                        hexline += "2" + s1;//call... 
+                        no_lines += 1;
+                        break;
+                    case "RET":
+                        line += "return" + nl;
+                        hexline += "0008";//ret. 
+                        no_lines += 1;
+                        break;
+                    case "SHL":
+                        //need to clear C first   and rlf/rrf  dont set zero flag!!
+                        line += "bcf" + t + "STATUS,0" + nl;
+                        line += t + "rlf" + t + "R" + Rd.ToString() + ",1" + nl;
+                        line += t + "movf" + t + "R" + Rd.ToString() + ",1" + nl;   //move to itself to set Z
+                        hexline += "1003";
+                        hexline += "0D" + (Rd + 0xA0).ToString("X");
+                        hexline += "08" + (Rd + 0xA0).ToString("X");
+                        no_lines += 3;
+                        break;
+                    case "SHR":
+                        //need to clear C first
+                        line += "bcf" + t + "STATUS,0" + nl;
+                        line += t + "rrf" + t + "R" + Rd.ToString() + ",1" + nl;
+                        line += t + "movf" + t + "R" + Rd.ToString() + ",1" + nl;   //move to itself to set Z
+                        hexline += "1003";
+                        hexline += "0C" + (Rd + 0xA0).ToString("X");
+                        hexline += "08" + (Rd + 0xA0).ToString("X");
+                        no_lines += 3;
+                        break;
+                    case "BTS": // included for simple flow diagrams.... syntax is BTS   Q,n
+                        //this uses 16F84A so PORTA for bits 0...3 and port B for bits 4...7
+                        int bit_field = System.Convert.ToInt16(data);
+                        if (bit_field < 4)
+                        {
+                            line += "bsf" + t + "PORTA," + data + nl;
+                            bit1 = Convert.ToInt16(data);
+                            bit2 = bit1 / 2;
+                            if (bit1 % 2 == 0)
+                            {
+                                hexline += (bit2 + 0x14).ToString("X") + "05";//even
+                            }
+                            else
+                            {
+                                hexline += (bit2 + 0x14).ToString("X") + "85";
+                            }
+                        }
+                        else 
+                        {
+                            line += "bsf" + t + "PORTB," + data + nl;
+                            bit1 = Convert.ToInt16(data);
+                            bit2 = bit1 / 2;
+                            if (bit1 % 2 == 0)
+                            {
+                                hexline += (bit2 + 0x14).ToString("X") + "06";//even
+                            }
+                            else
+                            {
+                                hexline += (bit2 + 0x14).ToString("X") + "86";
+                            }
+                        }
+
+                        no_lines += 1;
+                        break;
+                    case "BTC":// included for simple flow diagrams.... syntax is BTC   Q,n
+                        //this uses 16F84A so PORTA
+                        int bit_field1 = System.Convert.ToInt16(data);
+                        if (bit_field1 < 4)
+                        {
+                            line += "bcf" + t + "PORTA," + data.ToString() + nl;
+                            bit1 = Convert.ToInt16(data);
+                            bit2 = bit1 / 2;
+                            if (bit1 % 2 == 0)
+                            {
+                                hexline += (bit2 + 0x10).ToString("X") + "05";//even
+                            }
+                            else
+                            {
+                                hexline += (bit2 + 0x10).ToString("X") + "85";
+                            }
+                        }
+                        else
+                        {
+                            line += "bcf" + t + "PORTB," + data.ToString() + nl;
+                            bit1 = Convert.ToInt16(data);
+                            bit2 = bit1 / 2;
+                            if (bit1 % 2 == 0)
+                            {
+                                hexline += (bit2 + 0x10).ToString("X") + "06";//even
+                            }
+                            else
+                            {
+                                hexline += (bit2 + 0x10).ToString("X") + "86";
+                            }
+                        }
+                        no_lines += 1;
+                        break;
+
+                    case "RLF": // added for Will 2105 as extension
+                        //rlf/rrf  dont set zero flag!!
+                        line += t + "rlf" + t + "R" + Rd.ToString() + ",1" + nl;
+                        hexline += "0D" + (Rd + 0xA0).ToString("X");
+                        no_lines += 1;
+                        break;
+
+                    case "RRF":
+                        //rlf/rrf  dont set zero flag!!
+                        line += t + "rrf" + t + "R" + Rd.ToString() + ",1" + nl;
+                        hexline += "0C" + (Rd + 0xA0).ToString("X");
+                        no_lines += 1;
+                        break;
+
+                    case "EQUB":
+                        line += "db" + t + "0x00, 0x" + data + nl;
+                        if (data.Length == 1) data = "0" + data;
+                        hexline += "00" + data;
+                        no_lines += 1;
+                        break;
+                    case "BYTE":
+                        line += "db" + t + "0x00, 0x" + data + nl;
+                        if (data.Length == 1) data = "0" + data;
+                        hexline += "00" + data;
+                        no_lines += 1;
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            else
             {
-                case "":
-                    line += "nop" + nl;
-                    hexline += "0000"; no_lines += 1;
-                    break;
-                case "NOP":
-                    line += "nop" + nl;
-                    hexline += "0000"; no_lines += 1;
-                    break;
-                case "MOVI":
-                    line += "movlw " + t + "0x" + data + nl;
-                    line += t + "movwf" + t + "R" + Rd.ToString() + nl;
-                    if (data.Length == 1) data = "0" + data;
-                    hexline += "30" + data;// movlw
-                    hexline += "00" + (Rd + 0xA0).ToString("X");//movwf  (S0 is stored at 0x020 in PIC memory
-                    no_lines += 2;
-                    break;
-                case "MOV":
-                    line += "movf" + t + "R" + Rs.ToString() + ",0 " + nl;//ie to W
-                    line += t + "movwf" + t + "R" + Rd.ToString() + nl;
-                    if (data.Length == 1) data = "0" + data;
-                    hexline += "08" + (Rs + 0x20).ToString("X");//movf to W
-                    hexline += "00" + (Rd + 0xA0).ToString("X");//movwf
-                    no_lines += 2;
-                    break;
-                case "ADD":
-                    line += "movf" + t + "R" + Rs.ToString() + ",0 " + nl;
-                    line += t + "addwf" + t + "R" + Rd.ToString() + ",1 " + nl;
-                    hexline += "08" + (Rs + 0x20).ToString("X");//movf to W
-                    hexline += "07" + (Rd + 0xA0).ToString("X");//addwf
-                    no_lines += 2;
-                    break;
-                case "SUB":
-                    line += "movf" + t + "R" + Rs.ToString() + ",0 " + nl;
-                    line += t + "subwf" + t + "R" + Rd.ToString() + ",1 " + nl;
-                    hexline += "08" + (Rs + 0x20).ToString("X");//movf to W
-                    hexline += "02" + (Rd + 0xA0).ToString("X");//subwf to F
-                    no_lines += 2;
-                    break;
-                case "AND":
-                    line += "movf" + t + "R" + Rs.ToString() + ",0 " + nl;
-                    line += t + "andwf" + t + "R" + Rd.ToString() + ",1 " + nl;
-                    hexline += "08" + (Rs + 0x20).ToString("X");//movf to W
-                    hexline += "05" + (Rd + 0xA0).ToString("X");//andwf to F                   
-                    no_lines += 2;
-                    break;
-                case "EOR":
-                    line += "movf" + t + "R" + Rs.ToString() + ",0 " + nl;
-                    line += t + "xorwf" + t + "R" + Rd.ToString() + ",1 " + nl;
-                    hexline += "08" + (Rs + 0x20).ToString("X");//movf to W
-                    hexline += "06" + (Rd + 0xA0).ToString("X");//xorwf to F
-                    no_lines += 2;
-                    break;
-                case "INC":
-                    line += "incf" + t + "R" + Rd.ToString() + ",1 " + nl;
-                    hexline += "0A" + (Rd + 0xA0).ToString("X");//incf to F
-                    no_lines += 1;
-                    break;
-                case "DEC":
-                    line += "decf" + t + "R" + Rd.ToString() + ",1 " + nl;
-                    hexline += "03" + (Rd + 0xA0).ToString("X");//decf to F
-                    no_lines += 1;
-                    break;
+                line += op + "\t" + input + nl;
+                //so inline assembler..
+                switch (op)
+                {
+                    //following have 8 bit data field
+                    case "MOVLW":case "ADDLW":case "ANDLW":case "IORLW":case "RETLW":case "SUBLW":case "XORLW":
+                        if (!CheckAsmData(ref data, 0xFF, ref Rd, ref Rs)) { line = data; return false; }
+                        //cheeky   Rd has data field (ie litteral value or file reg or address and Rs has 1,0 value of d
+                        break;
+                    //following have 7 bit data  and d 
+                    case "MOVF":case "ADDWF":case "ANDWF": case"CLRF":case "COMF":case "DECF":case "DECFSZ":case "INCF":
+                    case "INCFSZ":case "MOVWF":case "RLF":case "RRF":case "SUBWF":case "SWAPF":case "XORWF":case "IORWF":
+                        if (!CheckAsmData(ref data, 0x7F, ref Rd, ref Rs)) { line = data; return false; }
+                        break;
+                    //following have 11 bit data
+                    case "CALL":case "GOTO":
+                        break;
+                    //followinf have 7 bits of data and a 3 bit bit field
+                    case "BCF":case "BSF":case "BTFSS":case "BTFSC":
+                        if (!CheckAsmData(ref data, 0x7F, ref Rd, ref Rs)) { line = data; return false; }
+                        //Rs needs to have the bit field....
+                        i = data.IndexOf(",");
+                        if (i > 0)
+                        {
+                            try { Rs = System.Convert.ToInt16(data.Substring(i + 1)); }
+                            catch { line = "Bit field wrong format "; return false; }
+                            if ((Rs > 7) | (Rs < 0)) { line = "Bit field out of range "; return false; }
+                        }
+                        break;
+                    //following have no data field!
+                    case "CLRWDT":
+                    case "RETURN":
+                    case "SLEEP":
+                    case "RETFIE":
+                    case "CLRW":
+                    case "NOP":
+                    case "{":
+                    case "}": 
+                        break;
+                    case "BANKSEL":
+                        if (!CheckAsmData(ref data, 0x03, ref Rd, ref Rs)) { line = data; return false; }
+                        break;
 
-                case "IN":
-                    if (!out_Option)
-                    {
-                        //read from portB
-                        line += "movf" + t + "PORTB,0" + nl;
-                        line += t + "movwf" + t + "R" + Rd.ToString() + nl;
-                        hexline += "0806";//movf to W
-                        hexline += "00" + (Rd + 0xA0).ToString("X");//movwf
-                        no_lines += 2;
-                    }
-                    if (out_Option)
-                    {
-                        //read from PORT C
+                    default:
+                        ErrorString= "Unkown ASm code" + op; return false;
+                }
+                if (data.Length == 1) data = "0" + data;
+                switch (op)
+                {
+                    //following have 8 bit data field
+                    case "MOVLW":   hexline += "30" + data;no_lines++;break;
+                    case "ADDLW":   hexline += "3E" + data;no_lines++;break;
+                    case "ANDLW":   hexline += "39" + data;no_lines++;break;
+                    case "IORLW":   hexline += "38" + data;no_lines++;break;
+                    case "RETLW":   hexline += "34" + data;no_lines++;break;
+                    case "SUBLW":   hexline += "3C" + data;no_lines++;break;
+                    case "XORLW":   hexline += "3A" + data;no_lines++;break;
+                    //following have 7 bit data  and d 
+                    case "MOVF":    
+                        Rd += Rs << 7; hexline += "08" + Rd.ToString("X");
+                        no_lines++;
+                        break;
+                    case "ADDWF":   Rd += Rs << 7; hexline += "07" + Rd.ToString("X"); no_lines++; break;
+                    case "ANDWF":   Rd += Rs << 7; hexline += "05" + Rd.ToString("X"); no_lines++; break;
+                    case "CLRF":    Rd += 0x3 << 7; hexline+= "0"+ Rd.ToString("X"); no_lines++; break;//no d
+                    case "COMF":    Rd += Rs << 7; hexline += "09" + Rd.ToString("X"); no_lines++; break;
+                    case "DECF":    Rd += Rs << 7; hexline += "03" + Rd.ToString("X"); no_lines++; break;
+                    case "DECFSZ":  Rd += Rs << 7; hexline += "0B" + Rd.ToString("X"); no_lines++; break;
+                    case "INCF":    Rd += Rs << 7; hexline += "0A" + Rd.ToString("X"); no_lines++; break;
+                    case "INCFSZ":  Rd += Rs << 7; hexline += "0F" + Rd.ToString("X"); no_lines++; break;
+                    case "IORWF":   Rd += Rs << 7; hexline += "04" + Rd.ToString("X"); no_lines++; break;
+                    case "MOVWF":   Rd += 0x01 << 7; hexline += "00" + Rd.ToString("X"); no_lines++; break;//no d
+                    case "RLF":     Rd += Rs << 7; hexline += "0D" + Rd.ToString("X"); no_lines++; break;
+                    case "RRF":     Rd += Rs << 7; hexline += "0C" + Rd.ToString("X"); no_lines++; break;
+                    case "SUBWF":   Rd += Rs << 7; hexline += "02" + Rd.ToString("X"); no_lines++; break;
+                    case "SWAPF":   Rd += Rs << 7; hexline += "0E" + Rd.ToString("X"); no_lines++; break;
+                    case "XORWF":   Rd += Rs << 7; hexline += "06" + Rd.ToString("X"); no_lines++; break;
+                    //following have 11 bit data
+                    case "CALL":
+                        if (ResolveLabels)
+                        {
+                            if (FindLabel_asm(data, ref i)) i += Code_start;
+                            else
+                            {
+                                //allow to be a value?
+                                if (!CheckAsmData(ref data, 0x7ff, ref Rd, ref Rs))
+                                {
+                                    ErrorString = "Label " + data + " not found ";
+                                    return false;
+                                }
+                                i = Rd;
+                            }
+                        }
+                        s1 = i.ToString("X");
+                        while (s1.Length < 3) s1 = "0" + s1;
+                        hexline += "2" + s1;//call... 
+                        no_lines += 1;
+                        break;
+                    case "GOTO": 
+                        if (ResolveLabels)
+                        {
+                            if (FindLabel_asm(data, ref i)) i += Code_start;
+                            else 
+                            {
+                                //allow to be a value?
+                                if (!CheckAsmData(ref data, 0x7ff, ref Rd, ref Rs))
+                                {
+                                    ErrorString = "Label " + data + " not found ";
+                                    return false;
+                                }
+                                i = Rd;
+                            }
+                        }
+                        i += 5 << 11;
+                        s1 = i.ToString("X");
+                        hexline += s1;
+                        no_lines++;
+                        break;
+                    //followinf have 7 bits of data and a 3 bit bit field
+                        //b is in Rs
+                    case "BCF": 
+                        Rd += Rs << 7;data=Rd.ToString("X");
+                        while (data.Length < 3) data="0"+data;
+                        hexline += "1" + data; no_lines++; 
+                        break;
+                    case "BSF":
+                        Rs = Rs + 8;
+                        Rd += Rs << 7;data=Rd.ToString("X");
+                        hexline += "1" + data; no_lines++; 
+                        break;
+                    case "BTFSS": 
+                        Rs = Rs + 24;
+                        Rd += Rs << 7;data=Rd.ToString("X");
+                        hexline += "1" + data; no_lines++; 
+                        break;
 
-                        //movf PORTC,W
-                        line += t+ "movf" + t + "PORTC,0" + nl;
-                        hexline += "0807";//movf to W
-                        
-                        //andlw  0x3F
-                        line += t+ "andlw"+t+" 0x3F" + nl;
-                        hexline += "393F";
-                        
-                        //movwf Rd
-                        line += t + "movwf" + t + "R" + Rd.ToString() + nl;
-                        hexline += "00" + (Rd + 0xA0).ToString("X");//movwf
-                        
-                        // btfsc   porta,4
-                        line += t + "btfsc PORTA,4" + nl;
-                        hexline += "1A05";
-                        
-                        // BSF  rd,6
-                        line += t + "bsf" + t + "R" + Rd.ToString()+",6" + nl;
-                        hexline+="17"+ (Rd + 0x20).ToString("X");
-                        
-                        // btfsc   porta,5
-                        line += t + "btfsc PORTA,5" + nl;
-                        hexline += "1A85";
-
-                        //BSF  RD,7
-                        line += t + "bsf" + t + "R" + Rd.ToString() + ",7" + nl;
-                        hexline += "17" + (Rd + 0xA0).ToString("X");
-
-                        no_lines += 7;
-
-                    }
-                    break;
-
-                case "OUT":
-                    if (!out_Option)
-                    {
-                        //tricky here cos bits 0-5 can go to port C, but b6/7 to Port A bits 4/5
-                        //  movf    Rs,W
-                        line += "movf" + t + "R" + Rs.ToString() + ",0" + nl;
-                        hexline += "08" + (Rs + 0x20).ToString("X");//movf to W
-
-                        //  movwf   PORTC   dont think this messes up serial...
-                        line += t + "movwf" + t + "PORTC" + nl;
-                        hexline += "0087";
-
-                        //  movwf   temp1
-                        line += t + "movwf" + t + "temp1" + nl;
-                        hexline += "00AA";//temp1 is at 2A
-
-                        //  rrf     temp1,1
-                        line += t + "rrf" + t + "temp1" + nl;
-                        hexline += "0CAA";
-
-                        //  rrf     temp1,1    bit 7 - 5
-                        line += t + "rrf" + t + "temp1" + nl;
-                        hexline += "0CAA";
-
-                        //  movlw   0x30
-                        line += t + "movlw" + t + "0x30" + nl;
-                        hexline += "3030";
-
-                        //  andwf   temp1,0
-                        line += t + "andwf" + t + "temp1,0" + nl;
-                        hexline += "052A";
-
-                        //  movwf   PORTA
-                        line += t + "movwf" + t + "PORTA" + nl;
-                        hexline += "0085";
-                        no_lines += 8;
-                    }
-
-                    if (out_Option)
-                    {
-
-                        //re-program to move out to PORT B 
-                        //  movf    Rs,W
-                        line += t+ "movf" + t + "R" + Rs.ToString() + ",0" + nl;
-                        hexline += "08" + (Rs + 0x20).ToString("X");//movf to W
-
-                        //  movwf   PORTB  
-                        line += t + "movwf" + t + "PORTB" + nl;
-                        hexline += "0086";
-                        no_lines += 2;
-                    }
-                    break;
-
-                case "TRISQ":
-                    if (!out_Option)
-                    {
-                        //tricky here cos bits 0-5 can go to port C, but b6/7 to Port A bits 4/5
-
-                        line += "movf" + t + "R" + Rs.ToString() + ",0" + nl;
-                        hexline += "08" + (Rs + 0x20).ToString("X");//movf to W
-
-                        //  movwf   PORTC   dont think this messes up serial...
-                        line += t + "movwf" + t + "PORTC" + nl;
-                        hexline += "0087";
-
-                        //  movwf   temp1
-                        line += t + "movwf" + t + "temp1" + nl;
-                        hexline += "00AA";//temp1 is at 2A
-
-                        //  rrf     temp1,1
-                        line += t + "rrf" + t + "temp1" + nl;
-                        hexline += "0CAA";
-
-                        //  rrf     temp1,1    bit 7 - 5
-                        line += t + "rrf" + t + "temp1" + nl;
-                        hexline += "0CAA";
-
-                        //  movlw   0x30
-                        line += t + "movlw" + t + "0x30" + nl;
-                        hexline += "3030";
-
-                        //  andwf   temp1,0
-                        line += t + "andwf" + t + "temp1,0" + nl;
-                        hexline += "052A";
-
-                        //  movwf   PORTA
-                        line += t + "movwf" + t + "PORTA" + nl;
-                        hexline += "0085";
-                        no_lines += 8;
-                    }
-
-                    if (out_Option)
-                    {
-
-                        // output on PORT B so only need to TRIS B   S0 has mask
-                        //  movf    R0,W
-                        line += t + "movf" + t + "R0,0" + nl;
-                        hexline += "08" + (0x20).ToString("X");//movf to W
-                        //bsf STATUS,RP0
-                        line += t + "bsf" + t + "STATUS, RP0" + nl;//bank 1
-                        hexline += "1683";
-                        //movwf TRISB
-                        line += t + "movwf"+t+	"TRISB" + nl;//
-                        hexline += "0086";
-                        //bcf STATUS,RP0
-                        line += t + "bcf" + t + "STATUS, RP0" + nl;//bank 1
-                        hexline += "1283";
-
-                        no_lines += 4;
-                    }
-                    break;
-
-                case "JP":
-                    line += "goto" + t + data + nl;
-                    if (ResolveLabels) 
-                    {
-                        if (FindLabel_asm(data, ref i)) i += Code_start + 0x800;
-                        else { 
-                            ErrorString = "Label " + data + " not found "; return false; 
-                        }  
-                    }
-
-
-                    hexline += "2" + i.ToString("X");//goto... 
-                    no_lines += 1;
-                    break;
-                case "JZ":
-                    line += "btfsc" + t + "STATUS,2" + nl;
-                    line += t + "goto" + t + data + nl;
-                    hexline += "1903";// status = 3
-                    if (ResolveLabels)
-                    {
-                        if (FindLabel_asm(data, ref i)) i += Code_start + 0x800;
-                        else { ErrorString = "Label " + data + " not found "; return false; }
-                    }
-                    hexline += "2" + i.ToString("X");//goto... 
-                    no_lines += 2;
-                    break;
-                case "JNZ":
-                    line += "btfss" + t + "STATUS,2" + nl;
-                    line += t + "goto" + t + data + nl;
-                    hexline += "1D03";// status = 3
-                    if (ResolveLabels)
-                    {
-                        if (FindLabel_asm(data, ref i)) i += Code_start+0x800;
-                        else { ErrorString = "Label " + data + " not found "; return false; }
-                    }
-                    hexline += "2" + i.ToString("X");//goto... 
-                    no_lines += 2;
-                    break;
-                case "JGT": //not really in the OCR set but included for the problem of flow diagrams gt
-                    //after subwf Y,W   sub w from F
-                    //  if W>Y then C=0 and jump is jump if  W>Y
-                    //if w < Y: Status,Z = 0. Status,C = 1. wnew = Y-w. 
-                    //if w == Y: Status,Z = 1. Status,C = 1. wnew = 0. 
-                    //if Y < w: Status,Z = 0. Status,C = 0. wnew = Y-w + 0x100.
-
-                    line += "btfss" + t + "STATUS,0" + nl;//carry flag
-                    line += t + "goto" + t + data + nl;
-                    hexline += "1C03";// status = 3 and bit =0
-                    if (ResolveLabels)
-                    {
-                        if (FindLabel_asm(data, ref i)) i += Code_start + 0x800;
-                        else { ErrorString = "Label " + data + " not found "; return false; }
-                    }
-                    hexline += "2" + i.ToString("X");//goto... 
-                    no_lines += 2;
-                    break;
-
-
-                case "RCALL":
-                    line += "call" + t + data + nl; i = 0;
-                    if (ResolveLabels)
-                    {
-                        if (FindLabel_asm(data, ref i)) i += Code_start;
-                        else { ErrorString = "Label "+data+" not found "; return false; }
-                    }
-                    string s1 = i.ToString("X");
-                    while (s1.Length < 3) s1 = "0" + s1;
-                    hexline += "2" + s1;//call... 
-                    no_lines += 1;
-                    break;
-                case "RET":
-                    line += "return" + nl;
-                    hexline += "0008";//ret. 
-                    no_lines += 1;
-                    break;
-                case "SHL":
-                    //need to clear C first   and rlf/rrf  dont set zero flag!!
-                    line += "bcf" + t + "STATUS,0" + nl;
-                    line += t + "rlf" + t + "R" + Rd.ToString() + ",1" + nl;
-                    line += t + "movf" + t + "R" + Rd.ToString() + ",1" + nl;   //move to itself to set Z
-                    hexline += "1003";
-                    hexline += "0D" + (Rd + 0xA0).ToString("X");
-                    hexline += "08" + (Rd + 0xA0).ToString("X");
-                    no_lines += 3;
-                    break;
-                case "SHR":
-                    //need to clear C first
-                    line += "bcf" + t + "STATUS,0" + nl;
-                    line += t + "rrf" + t + "R" + Rd.ToString() + ",1" + nl;
-                    line += t + "movf" + t + "R" + Rd.ToString() + ",1" + nl;   //move to itself to set Z
-                    hexline += "1003";
-                    hexline += "0C" + (Rd + 0xA0).ToString("X");
-                    hexline += "08" + (Rd + 0xA0).ToString("X");
-                    no_lines += 3;
-                    break;
-                case "BTS": // included for simple flow diagrams.... syntax is BTS   Q,n
-                    //this uses 16F84A so PORTA
-                    line += "bsf" + t + "PORTA," +data+ nl;
-                    bit1 = Convert.ToInt16(data);
-                    bit2 = bit1 / 2;
-                    if (bit1 % 2 == 0)
-                    {
-                        hexline += (bit2 + 0x14).ToString("X") + "05";//even
-                    }
-                    else
-                    {
-                        hexline += (bit2 + 0x14).ToString("X") + "85";
-                    }
-                    //only allowing n=0,1,2,3,4...
-                    //string s = Convert.ToString(Convert.ToInt32(data, 16), 2).PadLeft(data.Length * 4, '0');
-                    //s has data as binary..... if bit 0 set we need to set bit 7 of word..
-                    no_lines+=1;
-                    break;
-                case "BTC":// included for simple flow diagrams.... syntax is BTC   Q,n
-                    //this uses 16F84A so PORTA
-                    line += "bcf" + t + "PORTA," +data.ToString()+ nl;
-                    bit1 = Convert.ToInt16(data);
-                    bit2 = bit1 / 2;
-                    if (bit1 % 2 == 0)
-                    {
-                        hexline += (bit2 + 0x10).ToString("X") + "05";//even
-                    }
-                    else
-                    {
-                        hexline += (bit2 + 0x10).ToString("X") + "85";
-                    }
-                    no_lines+=1;
-                    break;
-
-                case "EQUB":
-                    line += "db" + t + "0x00, 0x" + data + nl;
-                    if (data.Length == 1) data = "0" + data;
-                    hexline += "00" + data;
-                    no_lines += 1;
-                    break;
-                case "BYTE":
-                    line += "db" + t + "0x00, 0x" + data + nl;
-                    if (data.Length == 1) data = "0" + data;
-                    hexline += "00" + data;
-                    no_lines += 1;
-                    break;
-                default:
-                    break;
+                    case "BTFSC":
+                        Rs = Rs + 16;
+                        Rd += Rs << 7;data=Rd.ToString("X");
+                        hexline += "1" + data; no_lines++; 
+                        break;
+                    //following have no data field!
+                    case "CLRWDT":  hexline += "0064"; no_lines++; break;
+                    case "RETURN":  hexline += "0008"; no_lines++; break;
+                    case "SLEEP":   hexline += "0063"; no_lines++; break;
+                    case "RETFIE":  hexline += "0009"; no_lines++; break;
+                    case "CLRW":    hexline += "0100"; no_lines++; break;
+                    case "NOP":     hexline += "0000"; no_lines++; break;
+                    case "{":case "}":
+                        break;
+                    case "BANKSEL":
+                        switch (Rd)
+                        {
+                            case 0:
+                                //bcf STATUS,5  bcf STATUS,6 status=3
+                                //bcf 03,5   bcf 03,6
+                                hexline += "1213"; no_lines++;
+                                hexline += "1303"; no_lines++;
+                                break;
+                            case 1:
+                                //bsf 03,5   bcf 03,6
+                                hexline += "1613"; no_lines++;
+                                hexline += "1303"; no_lines++;
+                                break;
+                            case 2:
+                                //bcf 03,5   bsf 03,6
+                                hexline += "1213"; no_lines++;
+                                hexline += "1713"; no_lines++;
+                                break;
+                            case 3:
+                                //bsf 03,5   bsf 03,6
+                                hexline += "1613"; no_lines++;
+                                hexline += "1713"; no_lines++;
+                                break;
+                        }
+                        break;
+                    default:
+                        ErrorString = "Unkown ASm code" + op; return false; break;
+                }
             }
             return true;
         }
         protected bool FindLabel_asm(string s,ref int value)
         {
+            if (InLineAssembler)
+            {
+                if (s == "STATUS") {value = 3; return true; }
+                if ((s == "PORTA")|(s=="TRISA")) { value = 5; return true; }
+                if ((s == "PORTB") |(s=="TRISB")){ value = 6; return true; }
+                if ((s == "PORTC") | (s == "TRISC")) { value = 7; return true; }
+            }
             for (int i = 0; i < maxlabels; i++)
             {
                 if (labels[i] == s)
@@ -909,15 +1202,65 @@ namespace SerialProgrammer
             {
                 s = "Invalid Register number " + s[1]; return false;
             }
-            if ((r < 0) || (r > 20))
+            if ((r < 0) || (r > 200))
             {
                 s = "Invalid Register number " + s[1]; return false;
             }
             return true;
         }
-        protected bool DecodeLine(ref string line, ref string label, ref string op, ref int Rs, ref int Rd, ref string data)
+        protected bool CheckAsmData(ref string s, int MaxValue, ref int value,ref int d)
         {
+            //so s has data field...  need to check range...
+            // data field might contain ,1... eg MOVF A0,1
+            int i = s.IndexOf(",");
+            string s1 = s; d = 1;//ie d=1 store in F reg
+            if (i > 0)
+            {
+                s1 = s.Substring(i + 1).Trim();
+                
+                try
+                {
+                    d = System.Convert.ToInt16(s1);//might be 0,1  ..,2...7  for bcf?
+                }
+                catch
+                {
+                }
+                if (s1 == "W") d = 0;//ie store in W
+                if (s1 == "F") d = 1;//ie store in F
+
+                if(s1=="0")d=0;//ie store in W
+                if (s1== "W") d = 0;//ie store in W
+                //not sure about bcf etc....
+                s1 = s.Substring(0, i);
+            }
+            
+            try
+            {
+                value = System.Convert.ToInt32(s1,16);
+            }
+            catch
+            {
+                s = "Data value wrong format";return false;
+            }
+            if (value > MaxValue) { s = "Data value too large"; return false; }
+
+            return true;
+        }
+        public bool DecodeLine(ref string line, ref string label, ref string op, ref int Rs, ref int Rd, ref string data)
+        {
+            int i = 0;
             line = line.ToUpper(); label = "";
+            if (line == "{")
+            {
+                InLineAssembler = true;
+                op = "{"; return true;//done!
+            }
+            if (line == "}")
+            {
+                InLineAssembler = false;
+                op = "}"; return true;
+            }
+            //if (InLineAssembler) { op = line; return true; }//done!
             int n = 0, k = 0;
             char[] c1 = new char[2]; c1[0] = (char)0x09; c1[1] = ' ';
             //strip comments
@@ -953,107 +1296,163 @@ namespace SerialProgrammer
                 line = line.Trim(c1);
                 data = line;
             }
-
-            switch (op)
+            if (InLineAssembler)
             {
-                case "":
-                    break;
-                case "MOVI":
-                    if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
-                    data = data.Substring(data.IndexOf(",") + 1);
-                    break;
-                case "MOV":
-                    if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
-                    data = data.Substring(data.IndexOf(",") + 1);
-                    if (!GetRegister(ref data, ref Rs)) { line = data; return false; }
-                    data = "";
-                    break;
-                case "ADD":
-                    if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
-                    data = data.Substring(data.IndexOf(",") + 1);
-                    if (!GetRegister(ref data, ref Rs)) { line = data; return false; }
-                    data = "";
-                    break;
-                case "SUB":
-                    if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
-                    data = data.Substring(data.IndexOf(",") + 1);
-                    if (!GetRegister(ref data, ref Rs)) { line = data; return false; }
-                    data = "";
-                    break;
-                case "AND":
-                    if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
-                    data = data.Substring(data.IndexOf(",") + 1);
-                    if (!GetRegister(ref data, ref Rs)) { line = data; return false; }
-                    data = "";
-                    break;
-                case "EOR":
-                    //todo... how to exor
-                    if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
-                    data = data.Substring(data.IndexOf(",") + 1);
-                    if (!GetRegister(ref data, ref Rs)) { line = data; return false; }
-                    data = "";
-                    break;
-                case "INC":
-                    if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
-                    data = "";
-                    break;
-                case "DEC":
-                    if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
-                    data = "";
-                    break;
-                case "IN":
-                    if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
-                    data = "";
-                    break;
-                case "OUT":
-                    data = data.Substring(data.IndexOf(",") + 1);
-                    if (!GetRegister(ref data, ref Rs)) { line = data; return false; }
-                    data = "";
-                    break;
-                case "JP":
-                    break;
-                case "JZ":
-                    break;
-                case "JNZ":
-                    break;
-                case "JGT": //note note real.. added for flow diagrams
-                    break;
-                case "RCALL":
-                    break;
-                case "TRISQ":
-                    break;
-                case "RET":
-                    break;
-                case "SHL":
-                    if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
-                    data = "";
-                    break;
-                case "SHR":
-                    if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
-                    data = "";
-                    break;
+                //Asm codes...
+                switch (op)
+                {
+                    //followinf have 8 bit data field
+                    case "MOVLW":case "ADDLW":case "ANDLW":case "IORLW":case "RETLW":case "SUBLW":case "XORLW":
+                        if (!CheckAsmData(ref data, 0xFF, ref Rd, ref Rs)) { line = data; return false; }
+                        //cheeky   Rd has data field (ie litteral value or file reg or address and Rs has 1,0 value of d
+                        break;
+                    //following have 7 bit data  and d 
+                    case "MOVF":case "ADDWF":case "ANDWF": case "COMF": case "DECF": case "DECFSZ": case "INCF":
+                    case "INCFSZ": case "IORWF": case "RLF": case "RRF": case "SUBWF":
+                    case "SWAPF":case "XORWF":
+                    case "MOVWF":
+                    case "CLRF":
+                        if (!CheckAsmData(ref data, 0x7F, ref Rd, ref Rs)) { line = data; return false; }
+                        break;
+                    //following have 11 bit data
+                    case "CALL":case "GOTO":
+                        break;
+                        //followinf have 7 bits of data and a 3 bit bit field
+                    case "BCF": case "BSF": case "BTFSS": case "BTFSC":
+                        if (!CheckAsmData(ref data, 0x7F, ref Rd, ref Rs)) { line = data; return false; }
+                        //Rs needs to have the bit field....
+                    i = data.IndexOf(",");
+                    if (i > 0)
+                    {
+                        try{Rs = System.Convert.ToInt16(data.Substring(i+1));}
+                        catch {line = "Bit field wrong format ";return false;}
+                        if ((Rs > 7) | (Rs < 0)) { line = "Bit field out of range "; return false; }
+                    }
+                        break;
+                    //following have no data field!
+                    case "CLRWDT":case "RETURN":case "SLEEP":case "RETFIE":case "CLRW":case "NOP":
+                    
+                        break;
+                    //following has value from 0,1,2,3
+                    case "BANKSEL":
+                        if (!CheckAsmData(ref data, 0x03, ref Rd, ref Rs)) { line = data; return false; }
+                        break;
+
+                    default:
+                        line = "Unkown ASm code" + op; return false; break;
+                }
+            }
+            else
+            {
+                // OCR codes
+                switch (op)
+                {
+                    //inline litterals ... data needs to be 8bits
 
 
-                case "BTS": // included for simple flow diagrams.... syntax is BTS   Q,n
-                    data = data.Substring(data.IndexOf(",") + 1,1);// should be the bit number...
-                    break;
-                case "BTC":
-                    data = data.Substring(data.IndexOf(",") + 1,1);// should be the bit number...
-                    break;
+                    case "":
+                        break;
+                    case "MOVI":
+                        if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
+                        data = data.Substring(data.IndexOf(",") + 1);
+                        break;
+                    case "MOV":
+                        if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
+                        data = data.Substring(data.IndexOf(",") + 1);
+                        if (!GetRegister(ref data, ref Rs)) { line = data; return false; }
+                        data = "";
+                        break;
+                    case "ADD":
+                        if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
+                        data = data.Substring(data.IndexOf(",") + 1);
+                        if (!GetRegister(ref data, ref Rs)) { line = data; return false; }
+                        data = "";
+                        break;
+                    case "SUB":
+                        if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
+                        data = data.Substring(data.IndexOf(",") + 1);
+                        if (!GetRegister(ref data, ref Rs)) { line = data; return false; }
+                        data = "";
+                        break;
+                    case "AND":
+                        if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
+                        data = data.Substring(data.IndexOf(",") + 1);
+                        if (!GetRegister(ref data, ref Rs)) { line = data; return false; }
+                        data = "";
+                        break;
+                    case "EOR":
+                        //todo... how to exor
+                        if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
+                        data = data.Substring(data.IndexOf(",") + 1);
+                        if (!GetRegister(ref data, ref Rs)) { line = data; return false; }
+                        data = "";
+                        break;
+                    case "INC":
+                        if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
+                        data = "";
+                        break;
+                    case "DEC":
+                        if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
+                        data = "";
+                        break;
+                    case "IN":
+                        if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
+                        data = "";
+                        break;
+                    case "OUT":
+                        data = data.Substring(data.IndexOf(",") + 1);
+                        if (!GetRegister(ref data, ref Rs)) { line = data; return false; }
+                        data = "";
+                        break;
+                    case "JP":
+                        break;
+                    case "JZ":
+                        break;
+                    case "JNZ":
+                        break;
+                    case "JGT": //note note real.. added for flow diagrams
+                        break;
+                    case "RCALL":
+                        break;
+                    case "RET":
+                        break;
+                    case "SHL":
+                        if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
+                        data = "";
+                        break;
+                    case "SHR":
+                        if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
+                        data = "";
+                        break;
+                    case "RLF":
+                        if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
+                        data = "";
+                        break;
+                    case "RRF":
+                        if (!GetRegister(ref data, ref Rd)) { line = data; return false; }
+                        data = "";
+                        break;
 
-                case "NOP":
-                    break;
+                    case "BTS": // included for simple flow diagrams.... syntax is BTS   Q,n
+                        data = data.Substring(data.IndexOf(",") + 1, 1);// should be the bit number...
+                        break;
+                    case "BTC":
+                        data = data.Substring(data.IndexOf(",") + 1, 1);// should be the bit number...
+                        break;
 
-                //emulator only
-                case "EQUB": 
-                    break;
-                case "BYTE":
-                    data = data;
-                    break;
+                    case "NOP":
+                        break;
+
+                    //emulator only
+                    case "EQUB": break;
+                    case "BYTE": break;
+                    case "BREAK": break;
+                    case "TRISQ": break;//added as ext to tristate output port,,,S0 has bit mask  0 for out
 
 
-                default:
-                    line = "Invalid Op code" + op; return false; 
+                    default:
+                        line = "Invalid Op code" + op; return false;
+                }
             }
             return true;
         }
@@ -1072,7 +1471,9 @@ namespace SerialProgrammer
             s += ":100040002008B2008100A0308B000030AE001320E9" + nl;
             s += ":10005000AE0B2728A10B2528051000308B000800C7" + nl;
             s += ":1000600000308B00640083160330810083128316F6" + nl;
-            s += ":0C007000FF308600E0308500831285011F" + nl;
+            //s += ":0C007000FF308600E0308500831285011F" + nl;///used to have ra4 as op
+            s += ":0C0070000F308600E0308500831285010F" + nl;// now has RA0..3 and RB4-7 as outputs
+
             //bytes in code 7 x 16 +12 = 007C  (ie (word)address 3E)so code starts at word 3E
             //going to write hexdata
             //next address is 007C
@@ -1111,7 +1512,7 @@ namespace SerialProgrammer
             }
             sum = sum % 256;
             i = 0x100 - sum;
-            return i.ToString("X");
+            if (i < 0x10) return "0" + i.ToString("X"); else return i.ToString("X");
         }
 
         public class OCRmodel
@@ -1121,6 +1522,7 @@ namespace SerialProgrammer
             public string OutputPort;
             public string Z;
             public string W;
+            public string C;//only used I think in break window...
         }
     }
 }

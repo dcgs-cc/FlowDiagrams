@@ -40,11 +40,7 @@
             "0",
             "1",
             "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7"});
+            "3"});
             this.comboBox1.Location = new System.Drawing.Point(112, 41);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(58, 24);

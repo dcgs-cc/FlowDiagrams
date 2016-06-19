@@ -60,3 +60,42 @@ C:\Users\cc\Documents\Visual Studio 2010\Projects\FlowDiagrams\FlowDiagrams\obj\
 C:\Users\cc\Documents\Visual Studio 2010\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.csproj.GenerateResource.Cache
 C:\Users\cc\Documents\Visual Studio 2010\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.Dialogs.PlayNoteEdit.resources
 C:\Users\cc\Documents\Visual Studio 2010\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.Dialogs.About.resources
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\bin\Debug\FlowDiagrams.exe.config
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.exe
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.pdb
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\bin\Debug\FlowDiagrams.exe.manifest
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\bin\Debug\FlowDiagrams.application
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\bin\Debug\FlowDiagrams.exe
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\bin\Debug\FlowDiagrams.pdb
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\bin\Debug\SerialProgrammer.dll
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\bin\Debug\SerialProgrammer.pdb
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.csprojResolveAssemblyReference.cache
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.Dialogs.About.resources
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.Dialogs.BreakEdit.resources
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.Dialogs.BreakWindow.resources
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.Dialogs.DataTable.resources
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.Dialogs.DecisionEdit.resources
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.Dialogs.ErrorDisplay.resources
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.Dialogs.InputEdit.resources
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.Dialogs.OutputEdit.resources
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.Dialogs.OutputPinEdit.resources
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.Dialogs.ParseOutput.resources
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.Dialogs.PlayNoteEdit.resources
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.Dialogs.ProcessEdit.resources
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.Dialogs.ScalingDialog.resources
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.Dialogs.SimpleDecisionEdit.resources
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.Dialogs.SubProcessEdit.resources
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.Dialogs.WaitSecEdit.resources
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.Form1.resources
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.InCircuitProgramer.resources
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.OCREmulator.resources
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.Properties.Resources.resources
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.csproj.GenerateResource.Cache
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.exe.manifest
+D:\Users\Projects\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.application
+C:\Users\chris\Desktop\FlowDiagrams\FlowDiagrams\bin\Debug\FlowDiagrams.exe.config
+C:\Users\chris\Desktop\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.exe
+C:\Users\chris\Desktop\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.pdb
+D:\Users\chris\github\FlowDiagrams\FlowDiagrams\bin\Debug\FlowDiagrams.exe.config
+D:\Users\chris\github\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.exe
+D:\Users\chris\github\FlowDiagrams\FlowDiagrams\obj\Debug\FlowDiagrams.pdb

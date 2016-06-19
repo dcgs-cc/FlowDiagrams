@@ -55,14 +55,17 @@ namespace FlowDiagrams
             ToolStripItem[] fred = this.menuStrip1.Items.Find("newToolStripMenuItem", true);
             foreach (ToolStripItem i in fred)
             {
-                i.Visible = !simpleModel;
+                //i.Visible = !simpleModel;
+                i.Enabled = !simpleModel;
             }
             //find the simple insert menu and enable it...
             fred = this.menuStrip1.Items.Find("simpleInsertToolStripMenuItem", true);
             foreach (ToolStripItem i in fred)
             {
-                i.Visible = simpleModel;
+                //i.Visible = simpleModel;
+                i.Enabled = simpleModel;
             }
+            
             label_End.Location = new Point(2000, 3000);//to set max size....  
 
             AllowDrop = true;
@@ -269,27 +272,41 @@ namespace FlowDiagrams
                 o1.wait= d1.wait;//max value is going to be 20...
 
                 control.text = "Wait " + d1.wait.ToString() + "s";
-                //if more than 1 sec we need to call mait1Sec
+                //if more than 1 sec we need to call wait1Sec
                 //fractions call wait1ms
                 int wait1 = (int)o1.wait;
-                control.Asmcode[0] = "linexx:     MOVI   S9," + (wait1).ToString("X");
-                control.Asmcode[1] = "D1linexx:   RCALL wait1Sec";
-                control.Asmcode[2] = "            DEC   S9";
-                control.Asmcode[3] = "            JNZ D1linexx";
-                decimal d2 = o1.wait - wait1;
-                d2 = d2 * 100; wait1 = (int)d2;
+                decimal d2 = 100*(o1.wait - wait1);
+                int wait0 = (int)d2;
+                if (wait1 > 0)
+                {
+                    control.Asmcode[0] = "linexx:     MOVI   S9," + (wait1).ToString("X");
+                    control.Asmcode[1] = "D1linexx:   RCALL wait1Sec";
+                    control.Asmcode[2] = "            DEC   S9";
+                    control.Asmcode[3] = "            JNZ D1linexx";
+                }
+                else
+                {
+                    control.Asmcode[0] = "linexx:     NOP";
+                    control.Asmcode[1] = "            NOP";
+                    control.Asmcode[2] = "            NOP";
+                    control.Asmcode[3] = "            NOP";
+                }
+                if (wait0 > 0)
+                {
+                    control.Asmcode[4] = "            MOVI   S9," + (wait0).ToString("X");
+                    control.Asmcode[5] = "D3linexx:   MOVI   S8,0A";
+                    control.Asmcode[6] = "D2linexx:   RCALL  wait1ms";
+                    control.Asmcode[7] = "            DEC    S8";
+                    control.Asmcode[8] = "            JNZ    D2linexx";
+                    control.Asmcode[9] = "            DEC    S9";
+                    control.Asmcode[10] = "           JNZ    D3linexx";
+                    control.n_asm = 11;
+                }
+                else
+                {
+                    control.n_asm = 4;
+                }
 
-                control.Asmcode[4] = "            MOVI   S9," + (wait1).ToString("X");
-                control.Asmcode[5] = "D3linexx:   MOVI   S8,0A";
-                control.Asmcode[6] = "D2linexx:   RCALL  wait1ms";
-                control.Asmcode[7] = "            DEC    S8";
-                control.Asmcode[8] = "            JNZ    D2linexx";
-                control.Asmcode[9] = "            DEC    S9";
-                control.Asmcode[10] = "           JNZ    D3linexx";
-
-
-
-                control.n_asm = 11;
                 control.Invalidate(); return;
                 /*
                  *                     s = "Wait " + b1; CheckHexByte(b1);
@@ -323,15 +340,19 @@ namespace FlowDiagrams
             {
                 PlayNote c1 = (PlayNote)control;
                 Dialogs.PlayNoteEdit d1 = new FlowDiagrams.Dialogs.PlayNoteEdit();
-                d1.frequency = c1.frequency; d1.Setup();
+                d1.frequency = c1.frequency;
+                d1.Length = c1.Length;
+                d1.Setup();
                 d1.ShowDialog();
                 c1.frequency = d1.frequency;
                 c1.Length = d1.Length;
-                int TimeValue = (1000000 / (c1.frequency * 16));
+                decimal f1 = c1.frequency;
+                int TimeValue = (int)(1000000 / (f1 * 16));
                 if (TimeValue < 15) { TimeValue = 15; c1.frequency = (1000000 / (16 * TimeValue)); }
                 if (TimeValue > 255) { TimeValue = 255; c1.frequency = (1000000 / (16 * TimeValue)); }
+                TimeValue = 0x100 - TimeValue;
                 c1.Asmcode[0] = "linexx:   movi   S0," + TimeValue.ToString("X");
-                c1.Asmcode[1] = "          movi   S1,"+c1.Length.ToString("X");
+                c1.Asmcode[1] = "          movi   S1,"+  c1.Length.ToString("X");
                 c1.text = "Play " + d1.frequency.ToString();
                 c1.Invalidate(); return;
             } 
@@ -457,7 +478,7 @@ namespace FlowDiagrams
             {
                 d.BoxesList.Add(f);
             }
-
+            if (d.BoxesList.Count == 1) ReflectModel(false);else ReflectModel(true);
         }
         private void inputBoxToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -550,7 +571,7 @@ namespace FlowDiagrams
             o.Box_Clicked += new FlowObject.Click_Select(Box_Clicked);
             o.Box_RightClicked += new FlowObject.Click_Right(Box_RightClicked);
             //o.Location = Cursor.Position;
-
+            ReflectModel(true);
             this.Invalidate();
         }
 
@@ -863,13 +884,20 @@ namespace FlowDiagrams
                     Stream TestFileStream = loadFileDialog.OpenFile();
                     BinaryFormatter serializer = new BinaryFormatter();
                     d = (FlowDiagram)serializer.Deserialize(TestFileStream);
+                    simpleModel=false;
                     foreach (FlowObject f in d.BoxesList) 
                     { 
                         Controls.Add(f);
                         f.Box_Clicked += new FlowObject.Click_Select(Box_Clicked);
                         f.Box_RightClicked += new FlowObject.Click_Right(Box_RightClicked);
+                        System.Type t1 = typeof(SimpleDecisionBox);
+                        if ((f is SimpleDecisionBox)||(f is WaitSec)||(f is OutputPin)||(f is PlayNote))
+                        {
+                            simpleModel=true;
+                        }
                     }
                     filename = loadFileDialog.FileName;
+                    ReflectModel(true);
                     TestFileStream.Close();
                 }
                 
@@ -1017,6 +1045,7 @@ namespace FlowDiagrams
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Dialogs.About d1 = new Dialogs.About();
+            d1.Setup(simpleModel);
             d1.ShowDialog();
         }
 
@@ -1348,6 +1377,40 @@ namespace FlowDiagrams
                 MessageBox.Show("Load Error" + e1.Message);
             }
 */
+        }
+
+        private void modelTypeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            simpleModel = !simpleModel;
+            ReflectModel(false);
+        }
+
+        private void ReflectModel(bool locked)
+        {
+            ToolStripItem[] fred = this.menuStrip1.Items.Find("newToolStripMenuItem", true);
+            foreach (ToolStripItem i in fred)
+            {
+                i.Enabled = !simpleModel;
+            }
+            //find the simple insert menu and enable it...
+            fred = this.menuStrip1.Items.Find("simpleInsertToolStripMenuItem", true);
+            foreach (ToolStripItem i in fred)
+            {
+                i.Enabled = simpleModel;
+            }
+
+            fred = this.menuStrip1.Items.Find("modelTypeToolStripMenuItem", true);
+            foreach (ToolStripItem i in fred)
+            {
+                i.Enabled = !locked;
+                i.Text = (simpleModel ? "Switch to Full Model" : "Switch to SimpleModel");
+            }
+            this.Text = "Using " + (simpleModel ? "SIMPLE Model and 16F84" : "AS Model and 16F886");
+        }
+
+        private void simpleInsertToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
 
 

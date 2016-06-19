@@ -23,6 +23,7 @@ namespace FlowDiagrams.Dialogs
         public void Setup()
         {
             numericUpDown1.Value = frequency;
+            numericUpDown2.Value = ((decimal) Length)/10;
         }
 
         private void button1_Click(object sender, EventArgs e)

@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
+  <asmv1:assemblyIdentity name="FlowDiagrams.exe" version="1.2.0.61" publicKeyToken="7a4219bbf551a3f8" language="en-GB" processorArchitecture="msil" type="win32" />
+  <description asmv2:iconFile="Resources\Icon1.ico" xmlns="urn:schemas-microsoft-com:asm.v1" />
+  <application />
+  <entryPoint>
+    <assemblyIdentity name="FlowDiagrams" version="2.1.6014.40112" language="neutral" processorArchitecture="msil" />
+    <commandLine file="FlowDiagrams.exe" parameters="" />
+  </entryPoint>
+  <trustInfo>
+    <security>
+      <applicationRequestMinimum>
+        <PermissionSet Unrestricted="true" ID="Custom" SameSite="site" />
+        <defaultAssemblyRequest permissionSetReference="Custom" />
+      </applicationRequestMinimum>
+      <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
+        <!--
+          UAC Manifest Options
+          If you want to change the Windows User Account Control level replace the 
+          requestedExecutionLevel node with one of the following.
+
+        <requestedExecutionLevel  level="asInvoker" uiAccess="false" />
+        <requestedExecutionLevel  level="requireAdministrator" uiAccess="false" />
+        <requestedExecutionLevel  level="highestAvailable" uiAccess="false" />
+
+         If you want to utilize File and Registry Virtualization for backward 
+         compatibility then delete the requestedExecutionLevel node.
+    -->
+        <requestedExecutionLevel level="asInvoker" uiAccess="false" />
+      </requestedPrivileges>
+    </security>
+  </trustInfo>
+  <dependency>
+    <dependentOS>
+      <osVersionInfo>
+        <os majorVersion="5" minorVersion="1" buildNumber="2600" servicePackMajor="0" />
+      </osVersionInfo>
+    </dependentOS>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="preRequisite" allowDelayedBinding="true">
+      <assemblyIdentity name="Microsoft.Windows.CommonLanguageRuntime" version="2.0.50727.0" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="preRequisite" allowDelayedBinding="true">
+      <assemblyIdentity name="System.Core" version="3.5.0.0" publicKeyToken="b77a5c561934e089" language="neutral" processorArchitecture="msil" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="preRequisite" allowDelayedBinding="true">
+      <assemblyIdentity name="System.Data.Entity" version="3.5.0.0" publicKeyToken="b77a5c561934e089" language="neutral" processorArchitecture="msil" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="preRequisite" allowDelayedBinding="true">
+      <assemblyIdentity name="WindowsBase" version="3.0.0.0" publicKeyToken="31bf3856ad364e35" language="neutral" processorArchitecture="msil" />
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="FlowDiagrams.exe" size="209856">
+      <assemblyIdentity name="FlowDiagrams" version="2.1.6014.40112" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+        <dsig:DigestValue>vwkajV7YWTHccqgklVdZywcVfK0=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="SerialProgrammer.dll" size="32768">
+      <assemblyIdentity name="SerialProgrammer" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+        <dsig:DigestValue>zj9NcihQjVlglGWCj8hHhV2uAzU=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <file name="FlowDiagrams.exe.config" size="117">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+      <dsig:DigestValue>a3Forh+i+nzyaONrpGeK7Sudu10=</dsig:DigestValue>
+    </hash>
+  </file>
+  <file name="Resources\Icon1.ico" size="1078">
+    <hash>
+      <dsig:Transforms>
+        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+      </dsig:Transforms>
+      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+      <dsig:DigestValue>QvZWJGWhEKBVm5QdGgpx9b7+cw4=</dsig:DigestValue>
+    </hash>
+  </file>
+<publisherIdentity name="CN=DESKTOP-RA8CR9J\chris" issuerKeyHash="5c13f57ad0a1eca141d788fd74f40ca4344da46c" /><Signature Id="StrongNameSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" /><DigestValue>Qvl/+V6Mm3IhzfsoF7JuSYJQmeQ=</DigestValue></Reference></SignedInfo><SignatureValue>X0VxITKsXoD+aCpsWXAyRLg5Wx5tmbT2nvgnE16XpZShw91m8pvMDvMbJEz9GrTgUDFlBp1FW5N00bPpLz/fuMx+iGiIzHwDgJmbyO4+mBG/uyGEpWQ7tgTCBVc4l0xNkqiZBK3/UdCdZr9W670tnOa5eljKiNL+qEL+Ay9c0ss=</SignatureValue><KeyInfo Id="StrongNameKeyInfo"><KeyValue><RSAKeyValue><Modulus>t0MdapKPGM9udNKWU0k5NK5U2mu7mqqgft+Tcg2H5MvIqtFLkzOeQHONs2OmAU1YDhbvHyUkXu0QugmXB2XzCn7fjx4ciPfStjTW3zMv2oUQtFmyC7tRj7vS3gl5efInkE7TdWC/h/z1+zuwMeTdwzQja77plYgmYjbYQk8K8M0=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><msrel:RelData xmlns:msrel="http://schemas.microsoft.com/windows/rel/2005/reldata"><r:license xmlns:r="urn:mpeg:mpeg21:2003:01-REL-R-NS" xmlns:as="http://schemas.microsoft.com/windows/pki/2005/Authenticode"><r:grant><as:ManifestInformation Hash="e4995082496eb21728fbcd21729b8c5ef97ff942" Description="" Url=""><as:assemblyIdentity name="FlowDiagrams.exe" version="1.2.0.61" publicKeyToken="7a4219bbf551a3f8" language="en-GB" processorArchitecture="msil" type="win32" /></as:ManifestInformation><as:SignedBy /><as:AuthenticodePublisher><as:X509SubjectName>CN=DESKTOP-RA8CR9J\chris</as:X509SubjectName></as:AuthenticodePublisher></r:grant><r:issuer><Signature Id="AuthenticodeSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" /><DigestValue>CYR9PNHh4GojmsWAiabFrx+NLis=</DigestValue></Reference></SignedInfo><SignatureValue>jsmQLwGh+5HbRnNbxr0D2pOG1wKa2ceZMsm8rhPdQ74K0MD8Vg72JqdOedY6Wid2Evig6N5ZKcJ2UZuoN58fkY2ApvXif9B7mAuwIBtt9QwKuIjWgM+NvFYmSRvrw5mvHZeJQHaBuAWILLTPd7xT6vZxv8hItgyW5HhFnOEs00g=</SignatureValue><KeyInfo><KeyValue><RSAKeyValue><Modulus>t0MdapKPGM9udNKWU0k5NK5U2mu7mqqgft+Tcg2H5MvIqtFLkzOeQHONs2OmAU1YDhbvHyUkXu0QugmXB2XzCn7fjx4ciPfStjTW3zMv2oUQtFmyC7tRj7vS3gl5efInkE7TdWC/h/z1+zuwMeTdwzQja77plYgmYjbYQk8K8M0=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><X509Data><X509Certificate>MIIB7TCCAVagAwIBAgIQJx2Fv6ik8KRC4raMY5heIjANBgkqhkiG9w0BAQUFADA1MTMwMQYDVQQDHioARABFAFMASwBUAE8AUAAtAFIAQQA4AEMAUgA5AEoAXABjAGgAcgBpAHMwHhcNMTYwNTEzMDczOTE5WhcNMTcwNTEzMTMzOTE5WjA1MTMwMQYDVQQDHioARABFAFMASwBUAE8AUAAtAFIAQQA4AEMAUgA5AEoAXABjAGgAcgBpAHMwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALdDHWqSjxjPbnTSllNJOTSuVNpru5qqoH7fk3INh+TLyKrRS5MznkBzjbNjpgFNWA4W7x8lJF7tELoJlwdl8wp+348eHIj30rY01t8zL9qFELRZsgu7UY+70t4JeXnyJ5BO03Vgv4f89fs7sDHk3cM0I2u+6ZWIJmI22EJPCvDNAgMBAAEwDQYJKoZIhvcNAQEFBQADgYEAD3bzWbxh6LlQoCm3NfgCfh8ryXJTeZgjlktz6ziiENK616sIQzCg2YYlKZbLBcnBKq5pDk9TfBID8Q5y1f8J6GhmDDn7Dtk0CkzkZVhplUSgz6V36X86W/GNKDe7myeejRSrYEx8/s4Tm6wDlEdPeQ1O9F1nCG5gOVFdS8RNLdc=</X509Certificate></X509Data></KeyInfo></Signature></r:issuer></r:license></msrel:RelData></KeyInfo></Signature></asmv1:assembly>

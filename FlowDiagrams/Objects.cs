@@ -1192,7 +1192,7 @@ namespace FlowDiagrams
     [Serializable]
     public class PlayNote : FlowObject, ISerializable
     {
-        public int frequency = 440;
+        public int frequency = 440;/// between 250 and 1300
         public int TimeValue = 0;
         public int Length = 10;//ie 1 sec
 
@@ -1200,9 +1200,10 @@ namespace FlowDiagrams
         {
             y_position = y; text = "Play 440"; x_position = x;
             Location = new Point(x - width / 2, y);
-            TimeValue = (1000000 / (frequency *16));
-            if (TimeValue<15) TimeValue=15;
-            if (TimeValue > 255) TimeValue = 255;
+
+            decimal f1 = frequency;
+            int TimeValue = (int)(1000000 / (f1 * 16));
+            TimeValue = 0x100 - TimeValue;
             Asmcode[0] = "linexx:   movi   S0,"+TimeValue.ToString("X"); n_asm = 0;
             Asmcode[1] = "          movi   S1,10";
             Asmcode[2] = "          rcall   PlayS0"; n_asm = 3;
